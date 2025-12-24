@@ -1,0 +1,35 @@
+atlas-mvp-fresh/
+│
+├── core/
+│   ├── __init__.py           ← Neu
+│   ├── crypto.py             ← Neu (nur Wallet + hash_data)
+│   ├── transaction.py        ← Neu (nur Transaction + EnergyTransaction)
+│   ├── tangle.py             ← Neu (vereinfacht)
+│   └── node.py               ← Neu (nur submit_energy)
+│
+├── token/
+│   ├── __init__.py           ← Neu
+│   └── engine.py             ← Neu (vereinfacht)
+│
+├── cli.py                    ← Neu
+├── requirements.txt          ← Neu
+├── README.md                 ← Neu
+│
+└── venv/                     ← Optional
+
+
+
+
+atlas-mvp/
+├── core/                # Kernlogik
+│   ├── crypto.py        # ed25519-Wallets, Hashing
+│   ├── transaction.py   # EnergyTransaction-Klasse
+│   ├── tangle.py        # DAG-Implementierung (Tangle)
+│   └── node.py          # Node mit submit_energy()
+├── tokens/              # Token-System
+│   └── engine.py        # Minting nach Bestätigung
+├── cli.py               # Command-Line Interface (in-memory)
+├── demo.py              # Vollständige End-to-End-Demo
+├── requirements.txt     # Abhängigkeiten
+├── LICENSE              # MIT-Lizenz
+└── README.md            # Diese Datei

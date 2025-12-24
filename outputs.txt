@@ -1,0 +1,98 @@
+-(venv) PS D:\atlas mvp> python cli.py create-node
+✅ Node erstellt: node1
+   Adresse: 894142cad918b6ff
+   (Merke dir die Adresse!)
+
+
+
+
+-(venv) PS D:\atlas mvp> python cli.py show-tangle
+
+📊 === Atlas MVP Statistiken ===
+
+Tangle:
+  Gesamt Transactions: -1
+  Bestätigte: 0
+  Tips (unbestätigt): 1
+  Nodes: 0
+
+Token System:
+  Geminte Transactions: 0
+  Token-Holder: 0
+  Gesamt Supply: 0 tokens
+(venv) PS D:\atlas mvp> 
+
+
+-(venv) PS D:\atlas mvp> python cli.py create-node --name solar1
+✅ Node erstellt: solar1
+   Adresse: c6cdb9acb1c0445d
+   (Merke dir die Adresse!)
+
+
+   -(venv) PS D:\atlas mvp> python cli.py create-node --name wind1
+✅ Node erstellt: wind1
+   Adresse: 7557903f403fdcaf
+   (Merke dir die Adresse!)
+(venv) PS D:\atlas mvp>
+
+
+
+-(venv) PS D:\atlas mvp> python demo.py
+✅ Node1 erstellt: d6670577cca9498e
+✅ Node2 erstellt: 923e612eec6753c8
+📨 Energie gemeldet (Node1): 50 kWh → TX ec844623...
+📨 Energie gemeldet (Node2): 30 kWh → TX 25d93c7c...
+🔁 Bestätigung 1/3 durchgeführt
+🔁 Bestätigung 2/3 durchgeführt
+🔁 Bestätigung 3/3 durchgeführt
+
+💰 Tokens gemint:
+   923e612e: +300.0 tokens (30.0 kWh)
+
+📊 Endgültige Balances:
+   923e612eec6753c8: 300.0 tokens
+(venv) PS D:\atlas mvp> 
+
+
+
+
+-(venv) PS D:\atlas mvp> python demo.py
+✅ Node1 erstellt: d6670577cca9498e
+✅ Node2 erstellt: 923e612eec6753c8
+📨 Energie gemeldet (Node1): 50 kWh → TX ec844623...
+📨 Energie gemeldet (Node2): 30 kWh → TX 25d93c7c...
+🔁 Bestätigung 1/3 durchgeführt
+🔁 Bestätigung 2/3 durchgeführt
+🔁 Bestätigung 3/3 durchgeführt
+
+💰 Tokens gemint:
+   923e612e: +300.0 tokens (30.0 kWh)
+
+📊 Endgültige Balances:
+   923e612eec6753c8: 300.0 tokens
+(venv) PS D:\atlas mvp> python demo.py
+✅ Node1 erstellt: 5b2416e25e89148e
+✅ Node2 erstellt: da431b5fbc1d601e
+📨 Energie gemeldet (Node1): 50 kWh → TX a5a52681...
+📨 Energie gemeldet (Node2): 30 kWh → TX 9cc00521...
+
+🔁 Starte Bestätigungsprozess für 2 Transaktionen...
+  Bestätigung 1/3 abgeschlossen
+  Bestätigung 2/3 abgeschlossen
+  Bestätigung 3/3 abgeschlossen
+
+💰 Versuche, Tokens zu minten...
+✅ Tokens erfolgreich gemint:
+   5b2416e2...: +500 tokens (50.0 kWh)
+   da431b5f...: +300 tokens (30.0 kWh)
+
+📊 Endgültige Token-Balances:
+   5b2416e25e89148e: 500 tokens
+   da431b5fbc1d601e: 300 tokens
+
+📈 Tangle-Statistiken:
+   Gesamt Transactions: 2
+   Bestätigte: 2
+   Tips: 1
+   Nodes: 2
+(venv) PS D:\atlas mvp> 
