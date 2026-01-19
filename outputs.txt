@@ -1,0 +1,334 @@
+-(venv) PS D:\atlas mvp> python cli.py create-node
+✅ Node erstellt: node1
+   Adresse: 894142cad918b6ff
+   (Merke dir die Adresse!)
+
+
+
+
+-(venv) PS D:\atlas mvp> python cli.py show-tangle
+
+📊 === Atlas MVP Statistiken ===
+
+Tangle:
+  Gesamt Transactions: -1
+  Bestätigte: 0
+  Tips (unbestätigt): 1
+  Nodes: 0
+
+Token System:
+  Geminte Transactions: 0
+  Token-Holder: 0
+  Gesamt Supply: 0 tokens
+(venv) PS D:\atlas mvp> 
+
+
+-(venv) PS D:\atlas mvp> python cli.py create-node --name solar1
+✅ Node erstellt: solar1
+   Adresse: c6cdb9acb1c0445d
+   (Merke dir die Adresse!)
+
+
+   -(venv) PS D:\atlas mvp> python cli.py create-node --name wind1
+✅ Node erstellt: wind1
+   Adresse: 7557903f403fdcaf
+   (Merke dir die Adresse!)
+(venv) PS D:\atlas mvp>
+
+
+
+-(venv) PS D:\atlas mvp> python demo.py
+✅ Node1 erstellt: d6670577cca9498e
+✅ Node2 erstellt: 923e612eec6753c8
+📨 Energie gemeldet (Node1): 50 kWh → TX ec844623...
+📨 Energie gemeldet (Node2): 30 kWh → TX 25d93c7c...
+🔁 Bestätigung 1/3 durchgeführt
+🔁 Bestätigung 2/3 durchgeführt
+🔁 Bestätigung 3/3 durchgeführt
+
+💰 Tokens gemint:
+   923e612e: +300.0 tokens (30.0 kWh)
+
+📊 Endgültige Balances:
+   923e612eec6753c8: 300.0 tokens
+(venv) PS D:\atlas mvp> 
+
+
+
+
+-(venv) PS D:\atlas mvp> python demo.py
+✅ Node1 erstellt: d6670577cca9498e
+✅ Node2 erstellt: 923e612eec6753c8
+📨 Energie gemeldet (Node1): 50 kWh → TX ec844623...
+📨 Energie gemeldet (Node2): 30 kWh → TX 25d93c7c...
+🔁 Bestätigung 1/3 durchgeführt
+🔁 Bestätigung 2/3 durchgeführt
+🔁 Bestätigung 3/3 durchgeführt
+
+💰 Tokens gemint:
+   923e612e: +300.0 tokens (30.0 kWh)
+
+📊 Endgültige Balances:
+   923e612eec6753c8: 300.0 tokens
+(venv) PS D:\atlas mvp> python demo.py
+✅ Node1 erstellt: 5b2416e25e89148e
+✅ Node2 erstellt: da431b5fbc1d601e
+📨 Energie gemeldet (Node1): 50 kWh → TX a5a52681...
+📨 Energie gemeldet (Node2): 30 kWh → TX 9cc00521...
+
+🔁 Starte Bestätigungsprozess für 2 Transaktionen...
+  Bestätigung 1/3 abgeschlossen
+  Bestätigung 2/3 abgeschlossen
+  Bestätigung 3/3 abgeschlossen
+
+💰 Versuche, Tokens zu minten...
+✅ Tokens erfolgreich gemint:
+   5b2416e2...: +500 tokens (50.0 kWh)
+   da431b5f...: +300 tokens (30.0 kWh)
+
+📊 Endgültige Token-Balances:
+   5b2416e25e89148e: 500 tokens
+   da431b5fbc1d601e: 300 tokens
+
+📈 Tangle-Statistiken:
+   Gesamt Transactions: 2
+   Bestätigte: 2
+   Tips: 1
+   Nodes: 2
+(venv) PS D:\atlas mvp> 
+
+
+python .\cli.py create-node
+python .\demo.py
+Keine Nodes erstellt
+(venv) PS D:\atlas mvp>
+
+
+
+(venv) PS D:\atlas mvp> python run.py
+C:\Users\farme\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'D:\\atlas mvp\\run.py': [Errno 2] No such file or directory
+(venv) PS D:\atlas mvp> python run.py
+Minted tokens for 1 contributions
+System state: {'dag_stats': {'total_transactions': 2, 'tips': 1, 'nodes': 2}, 'token_stats': {'total_supply': 300.0, 'holders': 1}, 'compute_stats': {'queue_length': 0}}
+(venv) PS D:\atlas mvp> python run.py
+Minted tokens for 2 contributions
+Job result: {'job_id': 'job_001', 'node_id': 'node_solar_01', 'status': 'completed', 'result': 830431}
+System state: {'dag_stats': {'total_transactions': 2, 'tips': 1, 'nodes': 2}, 'token_stats': {'total_supply': 800.0, 'holders': 2}, 'compute_stats': {'queue_length': 0}}
+(venv) PS D:\atlas mvp> 
+
+
+
+
+(venv) PS D:\atlas mvp> python .\cli.py
+Willkommen bei Atlas Post-MVP CLI. Tippe 'help' oder '?' für Hilfe.
+
+(atlas) ?
+
+Documented commands (type help <topic>):
+========================================
+confirm      exit        mint      show_balances  submit_job
+create_node  help        quit      show_state
+execute_job  list_nodes  set_node  submit_energy
+
+(atlas) execute.job
+❌ Unbekannter Befehl: 'execute.job'. Tippe 'help' für verfügbare Befehle.
+(atlas) create_node
+❌ Fehler: Bitte gib eine Node-ID an (z.B. 'solar_farm_1')
+(atlas) solar_farm_20
+❌ Unbekannter Befehl: 'solar_farm_20'. Tippe 'help' für verfügbare Befehle.
+(atlas) help
+
+Documented commands (type help <topic>):
+========================================
+confirm      exit        mint      show_balances  submit_job
+create_node  help        quit      show_state
+execute_job  list_nodes  set_node  submit_energy
+
+(atlas) submit_energy
+❌ Fehler: Keine aktuelle Node gesetzt. Nutze 'create_node' oder 'set_node'
+(atlas) create_node
+❌ Fehler: Bitte gib eine Node-ID an (z.B. 'solar_farm_1')
+(atlas) solar_farm_1
+❌ Unbekannter Befehl: 'solar_farm_1'. Tippe 'help' für verfügbare Befehle.
+(atlas) create_node node1
+✅ Node 'node1' erstellt und registriert.
+ℹ️  Aktuelle Node: node1
+(atlas) Traceback (most recent call last):
+  File "D:\atlas mvp\cli.py", line 187, in <module>
+    print(f"   {node_id}{marker}")
+^^^^^^^^^^^^^^^^
+  File "C:\Users\farme\AppData\Local\Programs\Python\Python312\Lib\cmd.py", line 126, in cmdloop
+    line = input(self.prompt)
+           ^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+(venv) PS D:\atlas mvp> 
+
+
+
+
+(venv) PS D:\atlas mvp> python .\cli.py
+Willkommen bei Atlas Post-MVP CLI. Tippe 'help' oder '?' für Hilfe.
+
+(atlas) ?
+
+Documented commands (type help <topic>):
+========================================
+confirm      exit        mint      show_balances  submit_job
+create_node  help        quit      show_state
+execute_job  list_nodes  set_node  submit_energy
+
+(atlas) execute.job
+❌ Unbekannter Befehl: 'execute.job'. Tippe 'help' für verfügbare Befehle.
+(atlas) create_node
+❌ Fehler: Bitte gib eine Node-ID an (z.B. 'solar_farm_1')
+(atlas) solar_farm_20
+❌ Unbekannter Befehl: 'solar_farm_20'. Tippe 'help' für verfügbare Befehle.
+(atlas) help
+
+Documented commands (type help <topic>):
+========================================
+confirm      exit        mint      show_balances  submit_job
+create_node  help        quit      show_state
+execute_job  list_nodes  set_node  submit_energy
+
+(atlas) submit_energy
+❌ Fehler: Keine aktuelle Node gesetzt. Nutze 'create_node' oder 'set_node'
+(atlas) create_node
+❌ Fehler: Bitte gib eine Node-ID an (z.B. 'solar_farm_1')
+(atlas) solar_farm_1
+❌ Unbekannter Befehl: 'solar_farm_1'. Tippe 'help' für verfügbare Befehle.
+(atlas) create_node node1
+✅ Node 'node1' erstellt und registriert.
+ℹ️  Aktuelle Node: node1
+(atlas) Traceback (most recent call last):
+  File "D:\atlas mvp\cli.py", line 187, in <module>
+    print(f"   {node_id}{marker}")
+^^^^^^^^^^^^^^^^
+  File "C:\Users\farme\AppData\Local\Programs\Python\Python312\Lib\cmd.py", line 126, in cmdloop
+    line = input(self.prompt)
+           ^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+(venv) PS D:\atlas mvp> python cli.py
+🆕 Neues System gestartet
+Willkommen bei Atlas Post-MVP CLI. Tippe 'help' oder '?' für Hilfe.
+
+(atlas) create_node solar_1
+✅ Node 'solar_1' erstellt und registriert.
+ℹ️  Aktuelle Node: solar_1
+(atlas) submit_energy 50.0 panel_a
+✅ Energie gemeldet: 50.0 kWh von Quelle 'panel_a'
+   TX-Hash: e5b02abf99bb...
+(atlas) show_balances
+ℹ️  Keine Balances vorhanden
+(atlas) confirm
+✅ 1 Transaktion(en) bestätigt
+(atlas) quit
+💾 Speichere Zustand...
+👋 Auf Wiedersehen!
+(venv) PS D:\atlas mvp> cli.py
+cli.py : Die Benennung "cli.py" wurde nicht als Name eines Cmdlet, einer Funktion, einer Skriptdatei oder eines ausführbaren Programms 
+erkannt. Überprüfen Sie die Schreibweise des Namens, oder ob der Pfad korrekt ist (sofern enthalten), und wiederholen Sie den Vorgang.       
+In Zeile:1 Zeichen:1
++ cli.py
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (cli.py:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+
+Suggestion [3,General]: Der Befehl cli.py wurde nicht gefunden. Er ist jedoch am aktuellen Ort vorhanden. Windows PowerShell lädt Befehle nicht standardmäßig vom aktuellen Ort. Wenn Sie diesem Befehl vertrauen, geben Sie stattdessen ".\cli.py" ein. Weitere Informationen erhalten Sie unter "get-help about_Command_Precedence".
+(venv) PS D:\atlas mvp> python .\cli.py
+📥 Vorheriger Zustand geladen
+Willkommen bei Atlas Post-MVP CLI. Tippe 'help' oder '?' für Hilfe.
+
+(atlas) create_node wind_1
+✅ Node 'wind_1' erstellt und registriert.
+(atlas) submit_energy 30.0 turbine_b
+❌ Fehler beim Hinzufügen zur DAG: Failed to add transaction to DAG
+(atlas) python .\cli.py
+❌ Unbekannter Befehl: 'python .\cli.py'. Tippe 'help' für verfügbare Befehle.
+(atlas) Traceback (most recent call last):
+  File "D:\atlas mvp\cli.py", line 215, in <module>
+    AtlasCLI().cmdloop()
+  File "C:\Users\farme\AppData\Local\Programs\Python\Python312\Lib\cmd.py", line 126, in cmdloop
+    line = input(self.prompt)
+           ^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+(venv) PS D:\atlas mvp> python .\cli.py
+📥 Vorheriger Zustand geladen
+Willkommen bei Atlas Post-MVP CLI. Tippe 'help' oder '?' für Hilfe.
+
+(atlas) submit_energy 30.0 turbine_b
+✅ Energie gemeldet: 30.0 kWh von Quelle 'turbine_b'
+   TX-Hash: 6638f15f7769...
+(atlas)
+
+
+
+
+(atlas) del atlas_state.json
+❌ Unbekannter Befehl: 'del atlas_state.json'. Tippe 'help' für verfügbare Befehle.
+(atlas)
+
+
+
+(venv) PS D:\atlas mvp> python .\cli.py
+📥 Vorheriger Zustand geladen
+Willkommen bei Atlas Post-MVP CLI. Tippe 'help' oder '?' für Hilfe.
+
+(atlas) submit_energy 30.0 turbine_b
+✅ Energie gemeldet: 30.0 kWh von Quelle 'turbine_b'
+   TX-Hash: 6638f15f7769...
+(atlas) del atlas_state.json
+❌ Unbekannter Befehl: 'del atlas_state.json'. Tippe 'help' für verfügbare Befehle.
+(atlas) create_node solar_farm
+✅ Node 'solar_farm' erstellt und registriert.
+(atlas) create_node wind_park
+✅ Node 'wind_park' erstellt und registriert.
+(atlas) set_node solar_farm
+✅ Aktuelle Node gesetzt: solar_farm
+(atlas) submit_energy 50.0 solar_panel_a
+✅ Energie gemeldet: 50.0 kWh von Quelle 'solar_panel_a'
+   TX-Hash: be9af908bd39...
+(atlas) set_node wind_park
+✅ Aktuelle Node gesetzt: wind_park
+(atlas) submit_energy 30.0 wind_turbine_b
+✅ Energie gemeldet: 30.0 kWh von Quelle 'wind_turbine_b'
+   TX-Hash: b624910b3a12...
+(atlas) confirm
+✅ 1 Transaktion(en) bestätigt
+(atlas) mint
+ℹ️  Keine neuen Beiträge zum Minten (benötigt ≥3 Bestätigungen)
+(atlas) set_node solar_farm
+✅ Aktuelle Node gesetzt: solar_farm
+(atlas) submit_job job_001 100.0 {"task": "prime_check", "n": 982451653}
+❌ Job 'job_001' abgelehnt (ungültig oder unzureichendes Guthaben)
+(atlas) execute_job
+❌ no_jobs_in_queue
+(atlas) show_balances
+ℹ️  Keine Balances vorhanden
+(atlas)
+
+
+
+
+
+(atlas) create_node solar
+✅ Node 'solar' erstellt und registriert.
+ℹ️  Aktuelle Node: solar
+(atlas) submit_energy 50.0 panel
+✅ Energie gemeldet: 50.0 kWh von Quelle 'panel'
+   TX-Hash: aef3fe356727...
+(atlas) confirm
+✅ 1 Transaktion(en) bestätigt
+(atlas) mint
+ℹ️  Keine neuen Beiträge zum Minten (benötigt ≥3 Bestätigungen)
+(atlas) confirm
+✅ 1 Transaktion(en) bestätigt
+(atlas) confirm
+✅ 1 Transaktion(en) bestätigt
+(atlas) confirm
+✅ 1 Transaktion(en) bestätigt
+(atlas) mint
+💰 1 Energie-Beiträge gemint:
+   solar: +500 Tokens (50.0 kWh)
+(atlas)

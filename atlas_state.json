@@ -1,0 +1,42 @@
+{
+  "nodes": [
+    "solar"
+  ],
+  "balances": {
+    "solar": 500.0
+  },
+  "total_supply": 500.0,
+  "processed_transactions": [
+    "aef3fe3567272e6662a8541ccc45631d7c1d4e956049d638d0530c41daccdbb8"
+  ],
+  "dag": {
+    "transactions": [
+      {
+        "hash": "aef3fe3567272e6662a8541ccc45631d7c1d4e956049d638d0530c41daccdbb8",
+        "payload": {
+          "type": "energy_contribution",
+          "amount_kwh": 50.0,
+          "source_id": "panel"
+        },
+        "parent1": "0000000000000000000000000000000000000000000000000000000000000000",
+        "parent2": "0000000000000000000000000000000000000000000000000000000000000000",
+        "node_id": "solar",
+        "timestamp": 1766855715,
+        "signature": null
+      }
+    ],
+    "tips": [
+      "aef3fe3567272e6662a8541ccc45631d7c1d4e956049d638d0530c41daccdbb8"
+    ],
+    "confirmations": {
+      "aef3fe3567272e6662a8541ccc45631d7c1d4e956049d638d0530c41daccdbb8": 4
+    },
+    "parents": {
+      "aef3fe3567272e6662a8541ccc45631d7c1d4e956049d638d0530c41daccdbb8": [
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ]
+    }
+  },
+  "job_queue": []
+}
