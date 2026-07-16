@@ -24,7 +24,7 @@ Atlas MVP demonstriert, wie erneuerbare Energieerzeuger (z. B. private Solaran
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-name/atlas-mvp.git
+git clone https://github.com/trungminhdo4-glitch/atlas-mvp.git
 cd atlas-mvp
 python -m venv venv
 source venv/bin/activate  # Linux/macOS
