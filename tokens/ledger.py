@@ -24,6 +24,7 @@ class TokenLedger:
         if current < amount:
             return False
         self.balances[node_id] = current - amount
+        self.total_supply -= amount
         return True
     
     def get_all_balances(self) -> Dict[str, float]:
