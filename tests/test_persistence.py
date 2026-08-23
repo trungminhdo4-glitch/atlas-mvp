@@ -5,7 +5,11 @@ import unittest
 from pathlib import Path
 
 from compute.job import ComputeJob
-from orchestration.coordinator import PROJECT_ROOT, Coordinator
+from orchestration.coordinator import (
+    PROJECT_ROOT,
+    Coordinator,
+    StateCorruptionError,
+)
 
 
 class FailingJsonModule:
@@ -131,11 +135,12 @@ class CoordinatorPersistenceTest(unittest.TestCase):
         second = self.state_file.read_bytes()
         self.assertEqual(first, second)
 
-    def test_corrupt_json_raises_and_preserves_file_bytes(self):
+    def test_corrupt_json_raises_stable_error_and_preserves_file_bytes(self):
         corrupt = b'{"nodes": ["n1", BROKEN'
         self.state_file.write_bytes(corrupt)
-        with self.assertRaises(json.JSONDecodeError):
+        with self.assertRaises(StateCorruptionError) as ctx:
             self.coord.load_state()
+        self.assertEqual(ctx.exception.failure_class, "syntax")
         self.assertEqual(self.state_file.read_bytes(), corrupt)
 
     def test_load_without_state_file_reports_fresh_start(self):
