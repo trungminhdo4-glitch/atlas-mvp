@@ -1,1 +1,7 @@
 /__pycache__
+__pycache__/
+*.pyc
+venv/
+.venv/
+atlas_state.json
+.atlas_state-*.tmp
