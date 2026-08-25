@@ -182,6 +182,12 @@ def _reconstruct_components(
                 f"dag.parents[{child_hash}] must be a pair of parent hashes",
             )
         parent1, parent2 = refs
+        tx = transactions[child_hash]
+        if (parent1, parent2) != (tx.parent1, tx.parent2):
+            reject(
+                "semantic",
+                f"dag.parents[{child_hash}] disagrees with transaction parents",
+            )
         for ref in (parent1, parent2):
             if ref != genesis and ref not in tx_hashes:
                 reject(

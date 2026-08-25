@@ -248,6 +248,15 @@ class StateIntegrityContractTest(unittest.TestCase):
         self._rewrite(reshape)
         self._assert_rejected("semantic")
 
+    def test_parent_map_must_match_transaction_parents(self):
+        def contradict(data):
+            index = self._energy_tx_index(data)
+            tx_hash = data["dag"]["transactions"][index]["hash"]
+            data["dag"]["parents"][tx_hash] = [tx_hash, tx_hash]
+
+        self._rewrite(contradict)
+        self._assert_rejected("semantic")
+
     def test_parents_key_set_mismatch_rejected(self):
         self._rewrite(lambda d: d["dag"].update({"parents": {}}))
         self._assert_rejected("semantic")
