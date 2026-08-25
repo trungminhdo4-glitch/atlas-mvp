@@ -1,3 +1,4 @@
+import threading
 import unittest
 
 from compute.job import ComputeJob
@@ -108,6 +109,124 @@ class TokenLifecycleTest(unittest.TestCase):
         self.assertEqual(
             self.coord.ledger.total_supply, sum(self.coord.ledger.balances.values())
         )
+
+    def test_insufficient_balance_preserves_fifo_job_until_funded(self):
+        self.coord.register_node("n1")
+        self.coord.ledger.credit_tokens("n1", 100.0)
+        first = ComputeJob("j1", "n1", 60.0, {"task": "first"})
+        second = ComputeJob("j2", "n1", 60.0, {"task": "second"})
+        third = ComputeJob("j3", "n1", 10.0, {"task": "third"})
+
+        self.assertTrue(self.coord.submit_compute_job(first))
+        self.assertTrue(self.coord.submit_compute_job(second))
+        self.assertTrue(self.coord.submit_compute_job(third))
+        self.assertEqual(self.coord.execute_next_job()["job_id"], "j1")
+        self.assertEqual(
+            [job.job_id for job in self.coord.scheduler.job_queue], ["j2", "j3"]
+        )
+
+        expected_error = {"error": "insufficient_balance", "job_id": "j2"}
+        self.assertEqual(self.coord.execute_next_job(), expected_error)
+        self.assertEqual(self.coord.execute_next_job(), expected_error)
+        self.assertEqual(
+            [job.job_id for job in self.coord.scheduler.job_queue], ["j2", "j3"]
+        )
+        self.assertEqual(self.coord.ledger.get_balance("n1"), 40.0)
+
+        self.coord.ledger.credit_tokens("n1", 30.0)
+        result = self.coord.execute_next_job()
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["job_id"], "j2")
+        self.assertEqual(self.coord.execute_next_job()["job_id"], "j3")
+        self.assertEqual(self.coord.scheduler.job_queue, [])
+        self.assertEqual(self.coord.execute_next_job(), {"error": "no_jobs_in_queue"})
+        self.assertEqual(self.coord.ledger.get_balance("n1"), 0.0)
+
+    def test_concurrent_callers_execute_and_debit_head_only_once(self):
+        self.coord.ledger.credit_tokens("n1", 100.0)
+        job = ComputeJob("j1", "n1", 30.0, {"task": "once"})
+        self.assertTrue(self.coord.submit_compute_job(job))
+
+        original_execute = self.coord.executor.execute_job
+        first_execution_started = threading.Event()
+        release_first_execution = threading.Event()
+        duplicate_execution_started = threading.Event()
+        second_call_started = threading.Event()
+        state_lock = threading.Lock()
+        execution_calls = 0
+        results = []
+        errors = []
+
+        def controlled_execute(next_job):
+            nonlocal execution_calls
+            with state_lock:
+                execution_calls += 1
+                call_number = execution_calls
+            if call_number == 1:
+                first_execution_started.set()
+                if not release_first_execution.wait(5):
+                    raise TimeoutError("test did not release the first execution")
+            else:
+                duplicate_execution_started.set()
+            return original_execute(next_job)
+
+        def execute(started=None):
+            if started:
+                started.set()
+            try:
+                result = self.coord.execute_next_job()
+                with state_lock:
+                    results.append(result)
+            except BaseException as exc:
+                with state_lock:
+                    errors.append(exc)
+
+        self.coord.executor.execute_job = controlled_execute
+        first_caller = threading.Thread(target=execute)
+        second_caller = threading.Thread(target=execute, args=(second_call_started,))
+        first_caller.start()
+        try:
+            self.assertTrue(first_execution_started.wait(2))
+            second_caller.start()
+            self.assertTrue(second_call_started.wait(2))
+            duplicate_before_release = duplicate_execution_started.wait(0.5)
+        finally:
+            release_first_execution.set()
+            first_caller.join(5)
+            if second_caller.ident is not None:
+                second_caller.join(5)
+
+        self.assertFalse(duplicate_before_release)
+        self.assertFalse(first_caller.is_alive())
+        self.assertFalse(second_caller.is_alive())
+        self.assertEqual(errors, [])
+        self.assertEqual(execution_calls, 1)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(sum(result.get("status") == "completed" for result in results), 1)
+        self.assertIn({"error": "no_jobs_in_queue"}, results)
+        self.assertEqual(self.coord.ledger.get_balance("n1"), 70.0)
+        self.assertEqual(self.coord.ledger.total_supply, 70.0)
+        self.assertEqual(self.coord.scheduler.job_queue, [])
+
+    def test_payload_processing_failure_retains_fifo_without_debit(self):
+        class ExplodingValue:
+            def __repr__(self):
+                raise RuntimeError("payload rendering failed")
+
+        self.coord.ledger.credit_tokens("n1", 100.0)
+        first = ComputeJob("j1", "n1", 30.0, {"value": ExplodingValue()})
+        second = ComputeJob("j2", "n1", 10.0, {"task": "second"})
+        self.assertTrue(self.coord.submit_compute_job(first))
+        self.assertTrue(self.coord.submit_compute_job(second))
+
+        for _ in range(2):
+            with self.assertRaisesRegex(RuntimeError, "payload rendering failed"):
+                self.coord.execute_next_job()
+            self.assertEqual(
+                [job.job_id for job in self.coord.scheduler.job_queue], ["j1", "j2"]
+            )
+            self.assertEqual(self.coord.ledger.get_balance("n1"), 100.0)
+            self.assertEqual(self.coord.ledger.total_supply, 100.0)
 
     def test_full_cycle_conservation_mint_then_spend(self):
         self._confirmed_contribution(kwh=12.0)

@@ -4,6 +4,7 @@ import os
 import tempfile
 from collections import defaultdict
 from pathlib import Path
+from threading import Lock
 from typing import List, Dict, Any, Tuple
 from core.dag import DAG
 from core.node import Node
@@ -305,6 +306,7 @@ class Coordinator:
         self.scheduler = JobScheduler(self.ledger)
         self.executor = ComputeExecutor(self.ledger)
         self.nodes: Dict[str, Node] = {}
+        self._job_execution_lock = Lock()
 
     def register_node(self, node_id: str) -> Node:
         if node_id in self.nodes:
@@ -350,10 +352,15 @@ class Coordinator:
         return self.scheduler.submit_job(job)
 
     def execute_next_job(self) -> Dict[str, Any]:
-        job = self.scheduler.get_next_job()
-        if not job:
-            return {"error": "no_jobs_in_queue"}
-        return self.executor.execute_job(job)
+        with self._job_execution_lock:
+            job = self.scheduler.peek_next_job()
+            if not job:
+                return {"error": "no_jobs_in_queue"}
+            result = self.executor.execute_job(job)
+            if result.get("status") == "completed":
+                if not self.scheduler.complete_job(job):
+                    raise RuntimeError("Completed job is no longer at the queue head")
+            return result
 
     def get_state(self) -> Dict[str, Any]:
         return {

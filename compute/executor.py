@@ -9,9 +9,6 @@ class ComputeExecutor:
         self.ledger = ledger
     
     def execute_job(self, job: ComputeJob) -> Dict[str, Any]:
-        if not self.ledger.debit_tokens(job.node_id, job.token_cost):
-            return {"error": "insufficient_balance", "job_id": job.job_id}
-        
         # DETERMINISTISCHER HASH (über Prozess-Neustarts hinweg konsistent)
         if isinstance(job.payload, dict):
             payload_str = str(sorted(job.payload.items()))
@@ -26,4 +23,7 @@ class ComputeExecutor:
             "status": "completed",
             "result": result_value
         }
+
+        if not self.ledger.debit_tokens(job.node_id, job.token_cost):
+            return {"error": "insufficient_balance", "job_id": job.job_id}
         return result
