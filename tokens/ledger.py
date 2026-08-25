@@ -12,7 +12,9 @@ class TokenLedger:
         return self.balances.get(node_id, 0.0)
     
     def credit_tokens(self, node_id: str, amount: float) -> None:
-        if amount <= 0:
+        if amount <= 0 or (
+            not isinstance(amount, int) and not math.isfinite(amount)
+        ):
             return
         current = self.balances.get(node_id, 0.0)
         self.balances[node_id] = current + amount

@@ -76,6 +76,21 @@ class TokenLifecycleTest(unittest.TestCase):
                 self.assertEqual(ledger.get_balance("a"), 100.0)
                 self.assertEqual(ledger.total_supply, 100.0)
 
+    def test_non_finite_credit_refusal_leaves_state_unchanged(self):
+        for amount in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(amount=amount):
+                ledger = TokenLedger()
+                ledger.credit_tokens("a", 100.0)
+                before = ledger.get_all_balances()
+
+                ledger.credit_tokens("b", amount)
+
+                self.assertEqual(ledger.get_all_balances(), before)
+                self.assertEqual(ledger.total_supply, 100.0)
+                self.assertEqual(
+                    ledger.total_supply, sum(ledger.get_all_balances().values())
+                )
+
     def test_job_submission_refused_without_balance(self):
         job = ComputeJob(job_id="j1", node_id="n1", token_cost=10.0, payload={"t": 1})
         self.assertFalse(self.coord.submit_compute_job(job))
