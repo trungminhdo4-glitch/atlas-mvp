@@ -66,11 +66,34 @@ class TokenLifecycleTest(unittest.TestCase):
         self.assertEqual(ledger.get_balance("a"), 100.0)
         self.assertEqual(ledger.total_supply, 100.0)
 
+    def test_non_finite_debit_refusal_leaves_state_unchanged(self):
+        for amount in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(amount=amount):
+                ledger = TokenLedger()
+                ledger.credit_tokens("a", 100.0)
+                self.assertFalse(ledger.debit_tokens("a", amount))
+                self.assertEqual(ledger.get_balance("a"), 100.0)
+                self.assertEqual(ledger.total_supply, 100.0)
+
     def test_job_submission_refused_without_balance(self):
         job = ComputeJob(job_id="j1", node_id="n1", token_cost=10.0, payload={"t": 1})
         self.assertFalse(self.coord.submit_compute_job(job))
         result = self.coord.execute_next_job()
         self.assertEqual(result, {"error": "no_jobs_in_queue"})
+
+    def test_non_finite_job_costs_are_refused_on_submission(self):
+        self.coord.ledger.credit_tokens("n1", 100.0)
+        for cost in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(cost=cost):
+                job = ComputeJob(
+                    job_id="invalid", node_id="n1", token_cost=cost, payload={}
+                )
+                self.assertFalse(job.is_valid())
+                self.assertFalse(self.coord.submit_compute_job(job))
+
+        self.assertEqual(self.coord.scheduler.get_queue_length(), 0)
+        self.assertEqual(self.coord.ledger.get_balance("n1"), 100.0)
+        self.assertEqual(self.coord.ledger.total_supply, 100.0)
 
     def test_executed_job_burns_exactly_token_cost(self):
         self.coord.register_node("n1")

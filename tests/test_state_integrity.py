@@ -215,6 +215,16 @@ class StateIntegrityContractTest(unittest.TestCase):
                 self._rewrite(mutator)
                 self._assert_rejected("structure")
 
+    def test_non_finite_queued_job_costs_rejected(self):
+        for cost in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(cost=cost):
+                self._rewrite(
+                    lambda data, invalid=cost: data["job_queue"][0].update(
+                        {"token_cost": invalid}
+                    )
+                )
+                self._assert_rejected("structure")
+
     # --- D. SEMANTIC_CORRUPT -------------------------------------------------
 
     def test_stored_hash_mismatch_rejected_as_semantic(self):

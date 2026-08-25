@@ -56,6 +56,12 @@ def _is_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
+def _is_finite_number(value: Any) -> bool:
+    return _is_number(value) and (
+        isinstance(value, int) or math.isfinite(value)
+    )
+
+
 def _reconstruct_components(
     source_name: str, data: Any
 ) -> Tuple[
@@ -240,10 +246,10 @@ def _reconstruct_components(
                     "structure",
                     f"job_queue[{index}].{field} must be a string",
                 )
-        if not _is_number(job_data.get("token_cost")):
+        if not _is_finite_number(job_data.get("token_cost")):
             reject(
                 "structure",
-                f"job_queue[{index}].token_cost must be a number",
+                f"job_queue[{index}].token_cost must be a finite number",
             )
         if not isinstance(job_data.get("payload"), dict):
             reject(
