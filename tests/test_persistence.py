@@ -86,6 +86,43 @@ class CoordinatorPersistenceTest(unittest.TestCase):
         after = self._snapshot(self._load_fresh())
         self.assertDictEqual(before, after)
 
+    def test_insufficient_balance_queue_survives_restart_and_later_executes(self):
+        coord = Coordinator()
+        coord.STATE_FILE = str(self.state_file)
+        coord.register_node("payer")
+        coord.ledger.credit_tokens("payer", 100.0)
+        first = ComputeJob("costly-1", "payer", 60.0, {"task": "first"})
+        second = ComputeJob("costly-2", "payer", 60.0, {"task": "second"})
+        third = ComputeJob("cheap-3", "payer", 10.0, {"task": "third"})
+        self.assertTrue(coord.submit_compute_job(first))
+        self.assertTrue(coord.submit_compute_job(second))
+        self.assertTrue(coord.submit_compute_job(third))
+
+        self.assertEqual(coord.execute_next_job()["job_id"], "costly-1")
+        self.assertEqual(
+            coord.execute_next_job(),
+            {"error": "insufficient_balance", "job_id": "costly-2"},
+        )
+        coord.save_state()
+
+        restarted = self._load_fresh()
+        self.assertEqual(
+            [job.job_id for job in restarted.scheduler.job_queue],
+            ["costly-2", "cheap-3"],
+        )
+        self.assertEqual(restarted.ledger.get_balance("payer"), 40.0)
+        restarted.ledger.credit_tokens("payer", 30.0)
+        result = restarted.execute_next_job()
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["job_id"], "costly-2")
+        self.assertEqual(restarted.execute_next_job()["job_id"], "cheap-3")
+        self.assertEqual(restarted.scheduler.job_queue, [])
+
+        restarted.save_state()
+        completed = self._load_fresh()
+        self.assertEqual(completed.scheduler.job_queue, [])
+        self.assertEqual(completed.execute_next_job(), {"error": "no_jobs_in_queue"})
+
     def test_reload_does_not_remint_processed_contributions(self):
         self.coord.save_state()
         supply_before = self.coord.ledger.total_supply

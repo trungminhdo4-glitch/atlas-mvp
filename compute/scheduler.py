@@ -20,6 +20,17 @@ class JobScheduler:
         if not self.job_queue:
             return None
         return self.job_queue.pop(0)
+
+    def peek_next_job(self) -> Optional[ComputeJob]:
+        if not self.job_queue:
+            return None
+        return self.job_queue[0]
+
+    def complete_job(self, job: ComputeJob) -> bool:
+        if not self.job_queue or self.job_queue[0] is not job:
+            return False
+        self.job_queue.pop(0)
+        return True
     
     def get_queue_length(self) -> int:
         return len(self.job_queue)

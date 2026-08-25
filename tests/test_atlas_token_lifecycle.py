@@ -86,6 +86,38 @@ class TokenLifecycleTest(unittest.TestCase):
             self.coord.ledger.total_supply, sum(self.coord.ledger.balances.values())
         )
 
+    def test_insufficient_balance_preserves_fifo_job_until_funded(self):
+        self.coord.register_node("n1")
+        self.coord.ledger.credit_tokens("n1", 100.0)
+        first = ComputeJob("j1", "n1", 60.0, {"task": "first"})
+        second = ComputeJob("j2", "n1", 60.0, {"task": "second"})
+        third = ComputeJob("j3", "n1", 10.0, {"task": "third"})
+
+        self.assertTrue(self.coord.submit_compute_job(first))
+        self.assertTrue(self.coord.submit_compute_job(second))
+        self.assertTrue(self.coord.submit_compute_job(third))
+        self.assertEqual(self.coord.execute_next_job()["job_id"], "j1")
+        self.assertEqual(
+            [job.job_id for job in self.coord.scheduler.job_queue], ["j2", "j3"]
+        )
+
+        expected_error = {"error": "insufficient_balance", "job_id": "j2"}
+        self.assertEqual(self.coord.execute_next_job(), expected_error)
+        self.assertEqual(self.coord.execute_next_job(), expected_error)
+        self.assertEqual(
+            [job.job_id for job in self.coord.scheduler.job_queue], ["j2", "j3"]
+        )
+        self.assertEqual(self.coord.ledger.get_balance("n1"), 40.0)
+
+        self.coord.ledger.credit_tokens("n1", 30.0)
+        result = self.coord.execute_next_job()
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["job_id"], "j2")
+        self.assertEqual(self.coord.execute_next_job()["job_id"], "j3")
+        self.assertEqual(self.coord.scheduler.job_queue, [])
+        self.assertEqual(self.coord.execute_next_job(), {"error": "no_jobs_in_queue"})
+        self.assertEqual(self.coord.ledger.get_balance("n1"), 0.0)
+
     def test_full_cycle_conservation_mint_then_spend(self):
         self._confirmed_contribution(kwh=12.0)
         self.coord.process_minting()
