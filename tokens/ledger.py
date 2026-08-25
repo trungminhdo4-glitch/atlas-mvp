@@ -1,3 +1,4 @@
+import math
 from typing import Dict, List
 from copy import deepcopy
 
@@ -18,7 +19,9 @@ class TokenLedger:
         self.total_supply += amount
     
     def debit_tokens(self, node_id: str, amount: float) -> bool:
-        if amount <= 0:
+        if amount <= 0 or (
+            not isinstance(amount, int) and not math.isfinite(amount)
+        ):
             return False
         current = self.balances.get(node_id, 0.0)
         if current < amount:

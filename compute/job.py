@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from typing import Any, Dict
 
@@ -14,5 +15,6 @@ class ComputeJob:
             bool(self.job_id) and
             bool(self.node_id) and
             self.token_cost > 0 and
+            (isinstance(self.token_cost, int) or math.isfinite(self.token_cost)) and
             isinstance(self.payload, dict)
         )
