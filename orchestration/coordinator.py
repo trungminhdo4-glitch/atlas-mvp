@@ -91,11 +91,13 @@ def _reconstruct_components(
     if not isinstance(data["balances"], dict):
         reject("structure", "'balances' must be an object")
     for holder, amount in data["balances"].items():
-        if not _is_number(amount):
-            reject("structure", f"'balances[{holder}]' must be a number")
+        if not _is_finite_number(amount):
+            reject("structure", f"'balances[{holder}]' must be a finite number")
         if amount < 0:
             reject("semantic", f"'balances[{holder}]' is negative")
-    if not _is_number(data["total_supply"]) or data["total_supply"] < 0:
+    if not _is_finite_number(data["total_supply"]):
+        reject("structure", "'total_supply' must be a finite number")
+    if data["total_supply"] < 0:
         reject("structure", "'total_supply' must be a non-negative number")
     if not isinstance(data["processed_transactions"], list) or not all(
         isinstance(tx_hash, str) for tx_hash in data["processed_transactions"]

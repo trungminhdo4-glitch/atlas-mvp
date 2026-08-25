@@ -225,6 +225,26 @@ class StateIntegrityContractTest(unittest.TestCase):
                 )
                 self._assert_rejected("structure")
 
+    def test_non_finite_ledger_balances_rejected(self):
+        for amount in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(amount=amount):
+                def replace_balance(data, invalid=amount):
+                    holder = next(iter(data["balances"]))
+                    data["balances"][holder] = invalid
+
+                self._rewrite(replace_balance)
+                self._assert_rejected("structure")
+
+    def test_non_finite_total_supply_rejected(self):
+        for amount in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(amount=amount):
+                self._rewrite(
+                    lambda data, invalid=amount: data.update(
+                        {"total_supply": invalid}
+                    )
+                )
+                self._assert_rejected("structure")
+
     # --- D. SEMANTIC_CORRUPT -------------------------------------------------
 
     def test_stored_hash_mismatch_rejected_as_semantic(self):
