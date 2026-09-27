@@ -48,6 +48,17 @@ class TokenLifecycleTest(unittest.TestCase):
         self.assertEqual(self.coord.process_minting(), [])
         self.assertEqual(self.coord.ledger.total_supply, 0.0)
 
+    def test_malformed_energy_payload_skipped_without_blocking_valid_mint(self):
+        self._confirmed_contribution(node_id="solar_1", kwh=5.0, source="solar_a")
+        self.coord.submit_energy("solar_2", "boom", "solar_b")  # type: ignore[arg-type]
+        self.coord.submit_energy("solar_3", None, "solar_c")  # type: ignore[arg-type]
+        for _ in range(3):
+            self.coord.confirm_transactions()
+        minted = self.coord.process_minting()
+        self.assertEqual(len(minted), 1)
+        self.assertEqual(self.coord.ledger.get_balance("solar_1"), 50.0)
+        self.assertEqual(self.coord.ledger.total_supply, 50.0)
+
     def test_ledger_conservation_across_credit_debit_cycle(self):
         ledger = TokenLedger()
         ledger.credit_tokens("a", 500.0)
@@ -217,7 +228,9 @@ class TokenLifecycleTest(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(execution_calls, 1)
         self.assertEqual(len(results), 2)
-        self.assertEqual(sum(result.get("status") == "completed" for result in results), 1)
+        self.assertEqual(
+            sum(result.get("status") == "completed" for result in results), 1
+        )
         self.assertIn({"error": "no_jobs_in_queue"}, results)
         self.assertEqual(self.coord.ledger.get_balance("n1"), 70.0)
         self.assertEqual(self.coord.ledger.total_supply, 70.0)

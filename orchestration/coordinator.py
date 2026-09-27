@@ -58,9 +58,7 @@ def _is_number(value: Any) -> bool:
 
 
 def _is_finite_number(value: Any) -> bool:
-    return _is_number(value) and (
-        isinstance(value, int) or math.isfinite(value)
-    )
+    return _is_number(value) and (isinstance(value, int) or math.isfinite(value))
 
 
 def _reconstruct_components(
@@ -341,7 +339,13 @@ class Coordinator:
         confirmed_txs = get_confirmed_transactions(self.dag, 3)
         contributions = []
         for tx in confirmed_txs:
-            contrib = EnergyContribution.from_transaction(tx.hash, tx.to_dict())
+            try:
+                contrib = EnergyContribution.from_transaction(tx.hash, tx.to_dict())
+            except (KeyError, TypeError, ValueError):
+                # Malformed energy record (e.g. hand-edited persisted state):
+                # exclude it like any other invalid contribution instead of
+                # aborting the whole mint pass.
+                continue
             contributions.append(contrib)
 
         from energy.validator import EnergyValidator
